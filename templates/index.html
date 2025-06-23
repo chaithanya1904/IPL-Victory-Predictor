@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IPL Win Predictor</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: url('{{ url_for('static', filename='stadium-bg.jpg') }}') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 40px;
+      border-radius: 15px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+    }
+
+    label {
+      font-weight: 500;
+      color: #f0f0f0;
+    }
+
+    select.form-control,
+    input.form-control {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid #ccc;
+    }
+
+    select.form-control option {
+      background-color: #1e1e1e;
+      color: #fff;
+    }
+
+    select.form-control:invalid {
+      color: #aaa;
+    }
+
+    .form-control::placeholder {
+      color: #ccc;
+    }
+
+    .form-control:focus {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border-color: #66afe9;
+      box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 30px;
+      font-size: 1.3em;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .result .text-success,
+    .result .text-danger {
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>IPL Victory Predictor</h1>
+  <form id="winPredictorForm" method="post">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="batting_team">Batting Team</label>
+        <select class="form-control" id="batting_team" name="batting_team" required>
+          <option value="" disabled selected>Please select a team</option>
+          {% for team in teams %}
+            <option value="{{ team }}" {% if team == request.form.batting_team %}selected{% endif %}>{{ team }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="bowling_team">Bowling Team</label>
+        <select class="form-control" id="bowling_team" name="bowling_team" required>
+          <option value="" disabled selected>Please select a team</option>
+          {% for team in teams %}
+            <option value="{{ team }}" {% if team == request.form.bowling_team %}selected{% endif %}>{{ team }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="city">Host City</label>
+      <select class="form-control" id="city" name="city" required>
+        <option value="" disabled selected>Please select a venue</option>
+        {% for city in cities %}
+          <option value="{{ city }}" {% if city == request.form.city %}selected{% endif %}>{{ city }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-3">
+        <label for="target">Target Score</label>
+        <input type="number" class="form-control" id="target" name="target" required value="{{ request.form.target }}">
+      </div>
+      <div class="form-group col-md-3">
+        <label for="score">Current Score</label>
+        <input type="number" class="form-control" id="score" name="score" required value="{{ request.form.score }}">
+      </div>
+      <div class="form-group col-md-3">
+        <label for="overs">Overs Completed</label>
+        <input type="number" step="0.1" class="form-control" id="overs" name="overs" required value="{{ request.form.overs }}">
+      </div>
+      <div class="form-group col-md-3">
+        <label for="wickets">Wickets Out</label>
+        <input type="number" class="form-control" id="wickets" name="wickets" required value="{{ request.form.wickets }}">
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Predict Probability</button>
+  </form>
+
+  {% if win_prob is defined and loss_prob is defined %}
+  <div class="result">
+    {% if win_prob > loss_prob %}
+      <p class="batting text-success">{{ batting_team }} - Win Probability: {{ win_prob }}%</p>
+      <p class="bowling text-danger">{{ bowling_team }} - Win Probability: {{ loss_prob }}%</p>
+    {% else %}
+      <p class="batting text-danger">{{ batting_team }} - Win Probability: {{ win_prob }}%</p>
+      <p class="bowling text-success">{{ bowling_team }} - Win Probability: {{ loss_prob }}%</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.getElementById('winPredictorForm').addEventListener('submit', function(event) {
+    const battingTeam = document.getElementById('batting_team').value;
+    const bowlingTeam = document.getElementById('bowling_team').value;
+    const city = document.getElementById('city').value;
+    const target = parseFloat(document.getElementById('target').value);
+    const score = parseFloat(document.getElementById('score').value);
+    const overs = parseFloat(document.getElementById('overs').value);
+    const wickets = parseInt(document.getElementById('wickets').value);
+
+    if (!battingTeam || !bowlingTeam) {
+      alert('Please select both batting and bowling teams.');
+      event.preventDefault();
+      return;
+    }
+
+    if (battingTeam === bowlingTeam) {
+      alert('Batting team and Bowling team cannot be the same.');
+      event.preventDefault();
+      return;
+    }
+
+    if (!city) {
+      alert('Please select a host city.');
+      event.preventDefault();
+      return;
+    }
+    const balls = Math.round((overs % 1) * 10);
+    if (balls > 6) {
+      alert('Invalid overs input. After .6, it should move to the next over (e.g., 10.6 is valid, 10.7 is not).');
+      event.preventDefault();
+      return;
+    }
+
+    if (target < 0 || score < 0 || overs < 0 || wickets < 0) {
+      alert('Target, Score, Overs, and Wickets cannot be negative.');
+      event.preventDefault();
+      return;
+    }
+
+    if (overs <= 0) {
+      alert('Atleat one ball should be completed in second innings to predict.');
+      event.preventDefault();
+      return;
+    }
+
+    if (overs > 20) {
+      alert('Overs Completed must be between 0 and 20.');
+      event.preventDefault();
+      return;
+    }
+
+    if (wickets > 10) {
+      alert('Wickets Out must be between 0 and 10.');
+      event.preventDefault();
+      return;
+    }
+
+    if (wickets > 0 && overs === 0) {
+      alert('Overs Completed must be greater than 0 if any wicket has fallen.');
+      event.preventDefault();
+      return;
+    }
+  });
+</script>
+
+</body>
+</html>
