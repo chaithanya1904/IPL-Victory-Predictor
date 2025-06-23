@@ -1,48 +1,54 @@
 # 🏏 IPL Victory Predictor
 
-A Machine Learning-based web application that predicts the probable winner of an IPL (Indian Premier League) match based on team, venue, and match conditions.
+A machine learning web app that predicts the **likely winner of an IPL (Indian Premier League) match** based on match conditions and current score.
 
-## 🔗 Live Demo
+---
 
-👉 [IPL Victory Predictor on Render](https://ipl-victory-predictor.onrender.com)
+## 🌐 Live Demo
 
-> ⚠️ **Note:** The application may take up to **50 seconds to respond** initially due to server cold-start latency on Render's free tier.
+👉 [Click here to try the IPL Victory Predictor](https://ipl-victory-predictor.onrender.com)
+
+> ⚠️ **Note:** The app may take up to **50 seconds to load** initially due to Render server cold-start latency (free tier).
 
 ---
 
 ## 🚀 Features
 
-- Predicts match winners using input such as:
-  - Batting and bowling team
-  - Venue
-  - Target score
-  - Current score and overs
-- Calculates:
-  - Run rate
-  - Required run rate
-  - Balls left and wickets remaining
-- Provides real-time prediction results
+✅ Predicts IPL match outcome using:
+- Batting & bowling teams  
+- Venue & target score  
+- Current score, overs, and wickets
+
+✅ Computes:
+- Required Run Rate  
+- Current Run Rate  
+- Balls remaining  
+- Wickets left
+
+✅ Real-time prediction result
 
 ---
 
-## 🧠 Machine Learning
+## 🧠 Machine Learning Details
 
 - **Algorithms Used**:
-  - Random Forest Classifier
-  - Logistic Regression (for comparison)
-- **Vectorization**:
-  - Categorical inputs are transformed using one-hot encoding
+  - 🟢 Random Forest Classifier
+  - 🔵 Logistic Regression (for comparison)
+
+- **Data Processing**:
+  - Converted categorical inputs into numerical vectors (One-Hot Encoding)
+
 - **Accuracy**:
-  - Random Forest delivered the best accuracy on test data
+  - Achieved higher accuracy with **Random Forest** after tuning
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: HTML, CSS (integrated with Flask templates)
-- **Backend**: Python, Flask
-- **ML Libraries**: scikit-learn, pandas, numpy
-- **Deployment**: Render
-
----
+| Layer       | Technologies Used                         |
+|-------------|-------------------------------------------|
+| Frontend    | HTML, CSS (Flask Templates)               |
+| Backend     | Python, Flask                             |
+| ML & Data   | scikit-learn, pandas, numpy               |
+| Deployment  | Render                                     |
 
